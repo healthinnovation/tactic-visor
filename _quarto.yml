@@ -19,7 +19,6 @@ website:
         text: Home
       - href: webmap.qmd
         text: Webmap
-        target: _blank
     right:
       - icon: github
         href: https://github.com/healthinnovation/tactic-visor

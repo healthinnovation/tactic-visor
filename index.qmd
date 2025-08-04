@@ -4,70 +4,80 @@ comments: false
 css: css/innova.css
 ---
 
-::: {.container}
-
+::: container
 <!-- FILA 1: Objetivo general -->
+
 ::: grid
-::: {.g-col-12}
+::: g-col-12
 ::: {.card .mb-4}
-::: {.card-body}
+::: card-body
+<h5 class="card-title">
 
-<h5 class="card-title"><strong>TACTIC-PERU</strong></h5>
+<strong>TACTIC-PERU</strong>
+
+</h5>
+
 <p class="card-text">
-As part of the TACTIC-PERU initiative, we aim to develop a digital tool for open access living research on the attribution of climate change impacts on health.
-</p>
 
+As part of the TACTIC-PERU initiative, we aim to develop a digital tool for open access living research on the attribution of climate change impacts on health.
+
+</p>
 :::
 :::
 :::
 :::
 
 <!-- FILA 2: Aims específicos -->
+
 ::: grid
-
 ::: {.g-col-12 .g-col-md-4}
 ::: {.card .mb-2}
-::: {.card-body}
+::: card-body
+::: aim-title
+AIM 1
+:::
 
-<div class="aim-title">AIM 1</div>
 <p class="card-text">
+
 Collect and synthesise existing evidence, data and methods on health impact attribution
-</p>
 
+</p>
 :::
 :::
 :::
 
 ::: {.g-col-12 .g-col-md-4}
 ::: {.card .mb-2}
-::: {.card-body}
+::: card-body
+::: aim-title
+AIM 2
+:::
 
-<div class="aim-title">AIM 2</div>
 <p class="card-text">
+
 Perform novel analyses to address complex methodological questions, using a set of case studies
-</p>
 
+</p>
 :::
 :::
 :::
 
 ::: {.g-col-12 .g-col-md-4}
 ::: {.card .mb-2}
-::: {.card-body}
+::: card-body
+::: aim-title
+AIM 3
+:::
 
-<div class="aim-title">AIM 3</div>
 <p class="card-text">
+
 Design user-friendly open access digital resources in a co-production process with relevant stakeholders
+
 </p>
-
 :::
 :::
 :::
-
 :::
 :::
 
 :::
-
-
-
