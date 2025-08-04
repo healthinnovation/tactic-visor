@@ -6,12 +6,12 @@ website:
   favicon: img/tactic.ico
   title: "Innovalab"
   twitter-card: 
-    image: "https://raw.githubusercontent.com/healthinnovation/Harmonize-Project/main/img/twitter-card.png"
+    image: "https://raw.githubusercontent.com/healthinnovation/tactic-visor/main/img/tactic-card.png"
     creator: "@antony_barja"
     site: "@antony_barja"
   open-graph:
     description: "TACTIC-PERU"
-    image: "https://raw.githubusercontent.com/healthinnovation/Harmonize-Project/main/img/twitter-card.png"
+    image: "https://raw.githubusercontent.com/healthinnovation/tactic-visor/main/img/tactic-card.png"
   navbar:
     logo: img/TACTIC_LOGO_white.png
     left:
