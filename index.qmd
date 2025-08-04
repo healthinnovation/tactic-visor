@@ -4,78 +4,70 @@ comments: false
 css: css/innova.css
 ---
 
-::: {#welcome-message-title .h1}
-:::
+::: {.container}
 
+<!-- FILA 1: Objetivo general -->
 ::: grid
-::: {.g-col-12 .g-col-md-10 .g-start-md-2}
-:::
+::: {.g-col-12}
+::: {.card .mb-4}
+::: {.card-body}
 
-::: {.g-col-12 .g-col-md-10 .g-start-md-2}
-::: {#welcome-message-title2 .h3}
-<p class="multipleStrings">
-
+<h5 class="card-title"><strong>TACTIC-PERU</strong></h5>
+<p class="card-text">
+As part of the TACTIC-PERU initiative, we aim to develop a digital tool for open access living research on the attribution of climate change impacts on health.
 </p>
+
 :::
 :::
+:::
+:::
+
+<!-- FILA 2: Aims específicos -->
+::: grid
 
 ::: {.g-col-12 .g-col-md-4}
 ::: {.card .mb-2}
-::: card-body
-<h5 class="card-title">
+::: {.card-body}
 
-Fieldwork
-
-</h5>
-
+<div class="aim-title">AIM 1</div>
 <p class="card-text">
-
-A web map-based monitoring system for the collection of geo-referenced information in the field using open source applications.
-
+Collect and synthesise existing evidence, data and methods on health impact attribution
 </p>
 
-<a href="webmap.html" class="btn btn-info stretched-link">Start reading</a>
-:::
-:::
-:::
-
-::: {.g-col-12 .g-col-md-4}
-::: {.card .mb-2}
-::: card-body
-<h5 class="card-title">
-
-Statistical methods
-
-</h5>
-
-<p class="card-text">
-
-Stratification and sampling of population centers in Loreto, Peru using Agglomerative Hierarchical Clustering and Stratified Sampling.
-
-</p>
-
-<a href="methodology.html" class="btn btn-warning stretched-link">Browse</a>
 :::
 :::
 :::
 
 ::: {.g-col-12 .g-col-md-4}
 ::: {.card .mb-2}
-::: card-body
-<h5 class="card-title">
+::: {.card-body}
 
-Data audit
-
-</h5>
-
+<div class="aim-title">AIM 2</div>
 <p class="card-text">
-
-Is a comprehensive summarize of databases on climate, health and sociodemographic variables. We include a metadata of all the main characteristics of each database. Our aim is to provide a friendly-user tool to visualize and select the most appropiate database to use.
-
+Perform novel analyses to address complex methodological questions, using a set of case studies
 </p>
 
-<br> <a href="https://healthinnovation.github.io/harmonize-dashboard/" class="btn btn-danger stretched-link">Take me there</a>
 :::
 :::
 :::
+
+::: {.g-col-12 .g-col-md-4}
+::: {.card .mb-2}
+::: {.card-body}
+
+<div class="aim-title">AIM 3</div>
+<p class="card-text">
+Design user-friendly open access digital resources in a co-production process with relevant stakeholders
+</p>
+
 :::
+:::
+:::
+
+:::
+:::
+
+:::
+
+
+

@@ -22,12 +22,16 @@ processed_path <- "data/processed/"
 ccpp_filename <- "ccpp-10km-strata-sample.csv"
 ccpp_filepath <- fs::path(processed_path, ccpp_filename)
 ccpp <- read_csv(ccpp_filepath) %>% 
-  st_as_sf(coords = c("lng","lat"), crs = 4326) 
+  filter(nomcp %in% c("QUISTOCOCHA", "LLANCHAMA", "EL VARILLAL", "SAN LUCAS", "12 DE ABRIL")) %>%
+  st_as_sf(coords = c("lng","lat"), crs = 4326)
+
 
 raw_path <- "data/processed/"
 areas_filename <- "tracking_area_by_communities.gpkg"
 areas_filepath <- fs::path(raw_path, areas_filename)
 areas <- st_read(areas_filepath, quiet = TRUE)
+areas <- st_read(areas_filepath, quiet = TRUE) %>%
+  filter(village %in% c("QUISTOCOCHA", "LLANCHAMA", "EL VARILLAL", "SAN LUCAS", "12 DE ABRIL"))
 
 metheoro_filename <- "metheorological_station_location.gpkg"
 metheoro_filepath <- fs::path(raw_path, metheoro_filename)
@@ -38,32 +42,9 @@ drone_1km_filename <- "flying_mission_1km2.gpkg"
 drone_1km_filepath <- fs::path(raw_path, drone_1km_filename)
 drone_1km <- st_read(drone_1km_filepath, quiet = TRUE) %>% 
   st_transform(4326) %>%
-  filter(!village %in% c("SAN MARTIN II ZONA","ZUNGAROCOCHA"))
+  filter(!village %in% c("SAN MARTIN II ZONA","ZUNGAROCOCHA"),
+         village %in% c("QUISTOCOCHA", "LLANCHAMA", "EL VARILLAL", "SAN LUCAS", "12 DE ABRIL"))
 
-zungaro <- st_read("data/processed/kml/zunga.kml",quiet=T) %>%
-  st_as_sf() %>%
-  mutate(
-    id = 1,
-    village = "ZUNGAROCOCHA",
-    area_ha = as.vector(unlist(st_area(geometry))/10000),
-    area_km2 = as.vector(unlist(st_area(geometry)/1000000))
-  ) %>%
-  select(id,village,area_ha,area_km2,geometry)%>%
-  rename(geom = geometry)
-
-
-cahuide <- st_read("data/processed/kml/cahuide.kml",quiet=T) %>%
-  st_as_sf() %>%
-  mutate(
-    id = 1,
-    village = "CAHUIDE",
-    area_ha = as.vector(unlist(st_area(geometry))/10000),
-    area_km2 = as.vector(unlist(st_area(geometry)/1000000))
-  ) %>%
-  select(id,village,area_ha,area_km2,geometry)%>%
-  rename(geom = geometry)
-
-drone_1km <- bind_rows(drone_1km,zungaro,cahuide)
 
 s10_pal <- colorFactor(
   palette = c("#772E25","#D1776A","#5F9596","#283D3B"),
@@ -84,7 +65,7 @@ map_layers <- function() {
     addProviderTiles(provider = providers$CartoDB,group = "CartoDB") %>% 
     addProviderTiles(provider = providers$CartoDB.DarkMatter,group = "CartoDB.DarkMatter") %>% 
     addProviderTiles(provider = providers$Esri.WorldImagery,group = "Esri.WorldImagery") %>% 
-    setView(lng = -73.44775,lat = -4.0,zoom = 11) %>%
+    setView(lng = -73.44775,lat = -4.0,zoom = 9) %>%
     addPulseMarkers(
       data = ccpp,
       icon = makePulseIcon(color=~s10_pal(hc_group_4), heartbeat = 1),
@@ -171,7 +152,7 @@ map_layers <- function() {
   #create layer control
   map <-  map %>% 
     addLayersControl(
-      baseGroups = c("CartoDB","CartoDB.DarkMatter","Open.Street.Map","Esri.WorldImagery"),
+      baseGroups = c("Open.Street.Map", "CartoDB","CartoDB.DarkMatter","Esri.WorldImagery"),
       overlayGroups = k[c(1:length(k))],
       options = layersControlOptions(collapsed = FALSE)
     ) %>% 
