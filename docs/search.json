@@ -5,5 +5,12 @@
     "title": "Innovalab",
     "section": "",
     "text": "TACTIC-PERU\n\n\nAs part of the TACTIC-PERU initiative, we aim to develop a digital tool for open access living research on the attribution of climate change impacts on health.\n\n\n\n\n\n\n\n\n\n\n\nAIM 1\n\n\nCollect and synthesise existing evidence, data and methods on health impact attribution\n\n\n\n\n\n\n\n\nAIM 2\n\n\nPerform novel analyses to address complex methodological questions, using a set of case studies\n\n\n\n\n\n\n\n\nAIM 3\n\n\nDesign user-friendly open access digital resources in a co-production process with relevant stakeholders\n\n\n\n\n\n\n:::"
+  },
+  {
+    "objectID": "webmap.html",
+    "href": "webmap.html",
+    "title": "Innovalab",
+    "section": "",
+    "text": "df_centroides &lt;- centroides %&gt;%\ntransmute(nomcp = NAME, lon, lat)\n# Crear dataframe con nombres y coords originales de ccpp\ndf_ccpp &lt;- ccpp %&gt;%\nst_drop_geometry() %&gt;%\ntransmute(nomcp, lon = lng, lat)\n# Unir ambos (sin hacer match)\ndf_todos &lt;- bind_rows(df_ccpp, df_centroides)\nhead(df_todos)\n\n\n# A tibble: 6 × 3\n  nomcp           lon   lat\n  &lt;chr&gt;         &lt;dbl&gt; &lt;dbl&gt;\n1 SAN CARLOS    -73.3 -3.96\n2 23 DE FEBRERO -73.5 -4.15\n3 12 DE ABRIL   -73.5 -4.22\n4 CAHUIDE       -73.5 -4.23\n5 SAN LUCAS     -73.5 -4.10\n6 LLANCHAMA     -73.4 -3.86"
   }
 ]

@@ -21,146 +21,78 @@ library(sf)
 processed_path <- "data/processed/"
 ccpp_filename <- "ccpp-10km-strata-sample.csv"
 ccpp_filepath <- fs::path(processed_path, ccpp_filename)
-ccpp <- read_csv(ccpp_filepath) %>% 
-  filter(nomcp %in% c("QUISTOCOCHA", "LLANCHAMA", "EL VARILLAL", "SAN LUCAS", "12 DE ABRIL")) %>%
-  st_as_sf(coords = c("lng","lat"), crs = 4326)
+ccpp <- read_csv(ccpp_filepath) 
+
+centroides <- read_csv("data/raw/centroids_tactic.csv")
+
+df_centroides <- centroides %>%
+  transmute(nomcp = NAME, lon, lat)
+
+df_ccpp <- ccpp %>%
+  st_drop_geometry() %>%
+  transmute(nomcp, lon = lng, lat)
+
+df_todos <- bind_rows(df_ccpp, df_centroides)
 
 
-raw_path <- "data/processed/"
-areas_filename <- "tracking_area_by_communities.gpkg"
-areas_filepath <- fs::path(raw_path, areas_filename)
-areas <- st_read(areas_filepath, quiet = TRUE)
-areas <- st_read(areas_filepath, quiet = TRUE) %>%
-  filter(village %in% c("QUISTOCOCHA", "LLANCHAMA", "EL VARILLAL", "SAN LUCAS", "12 DE ABRIL"))
 
-metheoro_filename <- "metheorological_station_location.gpkg"
-metheoro_filepath <- fs::path(raw_path, metheoro_filename)
-metheoro <- st_read(metheoro_filepath, quiet = TRUE) %>% 
-  st_cast("POINT")
+# comunidades que quieres descartar manualmente
+descartar <- c("CENTRO_POBLADO_12_DE_ABRIL",
+               "GRANJA_PORCINA_SAN_LUCAS",
+               "VARILLAL")
 
-drone_1km_filename <- "flying_mission_1km2.gpkg"
-drone_1km_filepath <- fs::path(raw_path, drone_1km_filename)
-drone_1km <- st_read(drone_1km_filepath, quiet = TRUE) %>% 
-  st_transform(4326) %>%
-  filter(!village %in% c("SAN MARTIN II ZONA","ZUNGAROCOCHA"),
-         village %in% c("QUISTOCOCHA", "LLANCHAMA", "EL VARILLAL", "SAN LUCAS", "12 DE ABRIL"))
+df_todos_unicos <- df_todos %>%
+  filter(!nomcp %in% descartar)
 
+pts <- df_todos_unicos %>%
+  st_as_sf(coords = c("lon", "lat"), crs = 4326, remove = FALSE)
+library(dplyr)
+library(sf)
+library(leaflet)
+library(leaflet.extras)
 
-s10_pal <- colorFactor(
-  palette = c("#772E25","#D1776A","#5F9596","#283D3B"),
-  domain = areas$hc_group_4
+library(dplyr)
+library(sf)
+library(leaflet)
+library(leaflet.extras)
+
+# pts: sf con columnas nomcp, lon, lat
+
+# 1) Normalizar nombres a los usados en el mapa
+pts_mapa <- pts %>%
+  mutate(nom_mapa = case_when(
+    nomcp == "PLAYA_DE_LUPUNA"      ~ "LUPUNA",
+    nomcp == "EL VARILLAL"          ~ "VARILLAL",
+    nomcp == "CEMENTERIO_STO_TOMAS" ~ "SANTO TOMAS",
+    nomcp == "SAN_PABLO_DE_CUYANA"  ~ "SAN PABLO DE CUYANA",
+    TRUE ~ nomcp
+  ))
+
+# 2) Mantener solo las comunidades visibles en la figura
+keep <- c(
+  "MAZAN","INDIANA","SANTO TOMAS","PADRE COCHA","LUPUNA","QUISTOCOCHA",
+  "SAN PABLO DE CUYANA","PARAISO","LLANCHAMA","VARILLAL","SAN LUCAS","12 DE ABRIL"
 )
 
-# "#005378" "#006FA0" "#5C99B3" "#9BCFC8" "#F2DDBD"
-map_layers <- function() {
-  #number of groups
-  k <- c(
-    "Perimeter qfield",
-    "Meteorological station",
-    "Flying mission with a spaced of 1km hv"
-  )
-  #base map
-  map <- leaflet() %>% 
-    addTiles(group = "Open.Street.Map") %>% 
-    addProviderTiles(provider = providers$CartoDB,group = "CartoDB") %>% 
-    addProviderTiles(provider = providers$CartoDB.DarkMatter,group = "CartoDB.DarkMatter") %>% 
-    addProviderTiles(provider = providers$Esri.WorldImagery,group = "Esri.WorldImagery") %>% 
-    setView(lng = -73.44775,lat = -4.0,zoom = 9) %>%
-    addPulseMarkers(
-      data = ccpp,
-      icon = makePulseIcon(color=~s10_pal(hc_group_4), heartbeat = 1),
-      popup = ~paste0(
-        "<center><h3> 🏕️",ccpp$nomcp,"</h3></center>","<hr>",
-        "- ⛈️Precipitation: ",round(ccpp$pr_avg,4),"<br>",
-        "- 💧Runoff: ",round(ccpp$ro_avg,4),"<br>",
-        "- ♒Soil mousture: ", round(ccpp$soil_avg,4),"<br>",
-        "- 🌡️Maximum temperature: ",round(ccpp$tmmx_avg,4),"<br>",
-        "- 🧊Minimum temperature: ",round(ccpp$tmmn_avg,4),"<br>",
-        "- 💦Evapotranspiration: ", round(ccpp$etp_avg,4),"<br>",
-        "- ☁️Humidity: ", round(ccpp$humidity_avg,4),"<br>",
-        "- 🌳🪓Deforestation: ", round(ccpp$def_avg,4),"<br>",
-        "- 🛣️Global Superficie Human: ",round(ccpp$ghsl_avg,4),"<br>",
-        "- ✨Nigth lights: ", round(ccpp$ln_avg,4),"<br>",
-        "- 🏙Population: ",round(ccpp$pop_avg,4) 
-      )
-    )
-  #loop through all groups and add a layer one at a time
-  for (i in 1:length(k)) {
-    if("Perimeter qfield" == k[[i]]){
-      map <- map %>% 
-        addPolygons(
-          data = areas,
-          fillOpacity = 0.9,
-          fillColor = ~s10_pal(hc_group_4),
-          stroke = 0,
-          opacity = 1,
-          popup = paste0(
-            "<h3>","🏡",areas$village,"</h3>","<hr>",
-            "- Area-Ha: ",round(areas$area_ha,4),"<br>",
-            "- Area-km2: ",round(areas$area_km2,4)),
-          group = k[[i]]
-        )
-    }
-    if("Meteorological station" == k[[i]]){
-      map <- map %>% 
-        addCircleMarkers(
-          data = metheoro,
-          group = k[[i]],
-          color = "blue",
-          weight = 1.5, 
-          radius = 8.5,
-          fillOpacity = 0,
-          opacity = 0.8 
-        ) %>%
-        addCircleMarkers(
-          data = metheoro,
-          group = k[[i]],
-          color = "red",
-          weight = 1.5, 
-          radius = 3.5,
-          fillOpacity = 0.5,
-          opacity = 0,
-          popup = paste0(
-            "<center><img src='",metheoro$photo,"' width='180px'/></center>",
-            "<hr>",
-            "<br>",
-            "<b>Observación:</b>",
-            metheoro$descrip,"."
-          )
-        )
-      
-    }
-    
-    if("Flying mission with a spaced of 1km hv" == k[[i]]){
-      map <- map %>% 
-        addPolygons(
-          data = drone_1km,
-          stroke = 2,
-          fillOpacity = 0,
-          color = "#005f73",
-          opacity = 1,
-          popup = paste0(
-            "<h3>","<img src='https://user-images.githubusercontent.com/23284899/209403801-c37d62d5-051c-49c5-a935-944f11df9b34.png' width='25px' align='center'> ",drone_1km$village,"</h3>","<hr>",
-            "- Area-Ha: ",round(drone_1km$area_ha,2),"<br>",
-            "- Area-km2: ",round(drone_1km$area_km2,2)),
-          group = k[[i]]
-        )
-    }
-    
-  }
-  
-  #create layer control
-  map <-  map %>% 
-    addLayersControl(
-      baseGroups = c("Open.Street.Map", "CartoDB","CartoDB.DarkMatter","Esri.WorldImagery"),
-      overlayGroups = k[c(1:length(k))],
-      options = layersControlOptions(collapsed = FALSE)
-    ) %>% 
-    hideGroup(as.character(k[c(0:length(k))]))  #hide all groups except the 1st one
-  
-  map
-}
+pts_mapa <- pts_mapa %>% 
+  filter(nom_mapa %in% keep) %>%
+  distinct(nom_mapa, .keep_all = TRUE)   # elimina duplicados por nombre
 
-#plot the map
-map_layers()
+# 3) Mapa con puntos “vibrando” y el nombre como label
+leaflet() %>%
+  addTiles() %>%
+  addPulseMarkers(
+    data  = pts_mapa,
+    icon  = makePulseIcon(color = "#1f77b4", heartbeat = 1, iconSize = 12),
+    label = ~nom_mapa,
+    group = "Communities"
+  ) %>%
+  addLayersControl(
+    baseGroups    = c("OpenStreetMap"),
+    overlayGroups = c("Communities"),
+    options       = layersControlOptions(collapsed = FALSE)
+  )
+
+
+
 ```
